@@ -1,0 +1,176 @@
+---
+title: "Introduction to decisiontree"
+output: rmarkdown::html_vignette
+description:
+  This is the alternative way of implementing decision tree model to using the rpart() function in the rpart package.
+vignette: >
+  %\VignetteIndexEntry{Put the title of your vignette here}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Decision tree is a tree-structured model where each internal node represents a test on an attribute, each branch represents the outcome of the test, and each leaf node represents a class label (in classification) or a continuous value (in regression). It mimics human decision-making processes, making them easy to understand and visualize. Although decision tree can be used in regression, we only discuss its classification function in the followings.
+
+The `decisiontree` package comprises six distinct functions, which can be categorized into two main sections. The first part consists of the `information_entropy`, `calculate_infor_gain`, `find_best_split`, and `myrpart` functions. These functions operate in a sequence to construct the decision tree's framework using the provided dataset. The second part includes the `predict_point` and `predict_datasets` functions. These are designed to make predictions on new data points utilizing the model trained by the first set of functions, subsequently yielding the predicted results.
+
+### The pipe
+
+### Calculate the information entropy with `information_entropy()`
+
+`information_entropy(labels)` allows us to calculate the information entropy using the following equation. The first and only argument is the labels which is represented by $xi$.
+$$ H(X) = -\sum_{i=1}^{n} P(x_i) \log_2 P(x_i) $$
+The result of $H(x)$ will be used as the criteria for splitting a node.
+
+### Calculate the information gain after splitting with `calculate_infor_gain()` 
+
+`calculate_infor_gain(data, left_data, right_data, target_col)` allows us to calculate the information gain using the information entropy before and after split. The first argument is the original data and the second and thrid arguments are the splitted data. The final argument is the target column in our dataset.
+
+### Find the best split with `find_best_split()`
+
+`find_best_split(data, target_col)` allows us to find the best split method based on the largest information gain. The first argument is the original data and the scecond argument is the target column in our dataset.
+
+### Predict with `predict_point()` and `predict_datasets()`
+
+`predict_point(tree, data_point)` allows us to predict a new data point's label using the trained tree and `predict_datasets(tree, dataset)` generalize the prediction to dataset level. In both functions, the first argument is the trained model and the second argument is the input data.
+
+## Demonstration of the usage of the functions
+
+`information_entropy` and `calculate_infor_gain` works as the foundation of `find_best_split` since information_entropy is the criteria for splitting a node. `myrpart` function uses the `find_best_split` function to grow a tree from one node to a whole tree iteratively. `predict_point` and `predict_datasets` functions uses the trained model to predict the label using input features.
+
+To demonstrate the usage of myrpart function and the original rpart function, we use stimulated dataset.
+
+```{r}
+# stimulated data
+set.seed(1)
+data <- data.frame(
+  feature1 = runif(100),
+  feature2 = runif(100),
+  target = sample(c("A", "B"), 100, replace = TRUE)
+)
+
+head(data)
+```
+
+### stimulated data:
+
+We use feature 1 and feature 2 to predict the target which consists of two labels A and B. 80% of data will be used as train data and the rest 20% will be used as test data.
+
+```{r}
+train_indices <- sample(1:nrow(data), 0.8 * nrow(data))
+train_data <- data[train_indices, ]
+test_data <- data[-train_indices, ]
+```
+
+Then we train both our models.
+
+```{r}
+library(decisiontree)
+library(rpart)
+
+my_tree_model <- myrpart(train_data, "target", max_depth = 5)
+tree_model <- rpart(target ~ feature1 + feature2, data = train_data, method = "class", maxdepth = 5)
+```
+
+```{r}
+# Predict training and testing sets using myrpart
+train_predictions_myrpart <- predict_dataset(my_tree_model, train_data)
+test_predictions_myrpart <- predict_dataset(my_tree_model, test_data)
+
+# Calculate accuracy for myrpart
+train_accuracy_myrpart <- sum(train_predictions_myrpart == train_data$target) / nrow(train_data)
+test_accuracy_myrpart  <- sum(test_predictions_myrpart == test_data$target) / nrow(test_data)
+
+# Predict training and testing sets using rpart
+train_predictions_rpart <- predict(tree_model, train_data, type = "class")
+test_predictions_rpart <- predict(tree_model, test_data, type = "class")
+
+# Calculate accuracy for rpart
+train_accuracy_rpart <- sum(train_predictions_rpart == train_data$target) / nrow(train_data)
+test_accuracy_rpart <- sum(test_predictions_rpart == test_data$target) / nrow(test_data)
+
+cat("Train accuracy for myrpart:", train_accuracy_myrpart, "Test accuracy for mypart:", test_accuracy_myrpart ,"\n", "Train accuracy for rpart:", train_accuracy_rpart, "Test accuracy for rpart:", test_accuracy_rpart, "\n")
+```
+From the output of this test, we can see that even the train accuracy of myrpart is lower than rpart, the test accuracy is suprisingly higher. However, we need to test multiple times prove its accuracy. We will also keep track of the time used for the two functions respectively.
+
+```{r out.width='100%', fig.align='center', dpi=300}
+library(ggplot2)
+
+train_accuracy_myrpart <- numeric()
+test_accuracy_myrpart <- numeric()
+train_accuracy_rpart <- numeric()
+test_accuracy_rpart <- numeric()
+
+total_time_myrpart <- 0
+total_time_rpart <- 0
+
+n_iterations <- 100
+
+for (i in 1:n_iterations) {
+ 
+  train_indices <- sample(1:nrow(data), 0.8 * nrow(data))
+  train_data <- data[train_indices, ]
+  test_data <- data[-train_indices, ]
+
+  start_time <- proc.time()
+  my_tree_model <- myrpart(train_data, "target", max_depth = 5)
+  end_time <- proc.time()
+  total_time_myrpart <- total_time_myrpart + (end_time - start_time)[3]
+  
+  start_time <- proc.time()
+  tree_model <- rpart(target ~ feature1 + feature2, data = train_data, method = "class", maxdepth = 5)
+  end_time <- proc.time()
+  total_time_rpart <- total_time_rpart + (end_time - start_time)[3]
+  
+  tree_model <- rpart(target ~ feature1 + feature2, data = train_data, method = "class", maxdepth = 5)
+
+  train_pred_myrpart <- predict_dataset(my_tree_model, train_data)
+  test_pred_myrpart <- predict_dataset(my_tree_model, test_data)
+  train_pred_rpart <- predict(tree_model, train_data, type = "class")
+  test_pred_rpart <- predict(tree_model, test_data, type = "class")
+
+  train_accuracy_myrpart[i] <- sum(train_pred_myrpart == train_data$target) / nrow(train_data)
+  test_accuracy_myrpart[i]  <- sum(test_pred_myrpart == test_data$target) / nrow(test_data)
+  train_accuracy_rpart[i] <- sum(train_pred_rpart == train_data$target) / nrow(train_data)
+  test_accuracy_rpart[i] <- sum(test_pred_rpart == test_data$target) / nrow(test_data)
+}
+
+average_train_accuracy_myrpart <- mean(train_accuracy_myrpart)
+average_test_accuracy_myrpart  <- mean(test_accuracy_myrpart)
+average_train_accuracy_rpart <- mean(train_accuracy_rpart)
+average_test_accuracy_rpart <- mean(test_accuracy_rpart)
+
+accuracy_data <- data.frame(
+  Iteration = rep(1:n_iterations, each = 4),
+  Method = rep(c("myrpart Train", "myrpart Test", "rpart Train", "rpart Test"), times = n_iterations),
+  Accuracy = c(train_accuracy_myrpart, test_accuracy_myrpart, train_accuracy_rpart, test_accuracy_rpart)
+)
+
+
+ggplot(accuracy_data, aes(x = Iteration, y = Accuracy, group = Method)) +
+  geom_line(aes(color = Method)) +
+  geom_hline(yintercept = average_train_accuracy_myrpart, size = 0.2, linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = average_test_accuracy_myrpart,size = 0.2, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = average_train_accuracy_rpart, size = 0.2, linetype = "dashed", color = "green") +
+  geom_hline(yintercept = average_test_accuracy_rpart, size = 0.2, linetype = "dashed", color = "orange") +
+  labs(title = "Model Accuracy", x = "Iteration", y = "Accuracy") +
+  theme_minimal() +
+  theme(legend.position = "bottom",  # 将图例置于底部
+        legend.text = element_text(size = 8),  # 设置图例文本的大小
+        legend.key.size = unit(0.5, "cm"))+
+  guides(color = guide_legend(nrow = 2))# 设置图例键的大小
+
+
+cat("Total time for myrpart: ", total_time_myrpart, "seconds\n")
+cat("Total time for rpart: ", total_time_rpart, "seconds\n")
+```
+
+It is hard to see from the line chart that which method is better. However, when we look at the dashed line which representing the mean accuracy over the 100 iterations we can see that green line is higher than blue line and orange line is higher than red line which means that rpart() function beats myrpart() function in both train accuracy and test accuracy generally. It is worth noticing that the difference is not too large.
+
+As for the efficiency of the two functions, from the `total_time_myrpart` and `total_time_rpart` we can see that there is a huge gap between the efficiency of the myrpart and rpart. There are many reasons behind it and one of them is that rpart() is written in C.
+
+
+

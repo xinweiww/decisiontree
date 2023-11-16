@@ -9,7 +9,8 @@
 #' @export
 #'
 #' @examples
-#' find_best_split(data, target_col)
+#' data <- data.frame(feature1 = runif(10),feature2 = runif(10),target = sample(c("A", "B"), 10, replace = TRUE))
+#' find_best_split(data, 'target')
 find_best_split <- function(data, target_col) {
   # obtain all the features names except for the target column feature
   features <- colnames(data)[!colnames(data) %in% target_col]

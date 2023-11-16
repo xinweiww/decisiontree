@@ -12,7 +12,8 @@
 #' @export
 #'
 #' @examples
-#' myrpart(train_data, "target", max_depth = 3)
+#' data <- data.frame(feature1 = runif(10),feature2 = runif(10),target = sample(c("A", "B"), 10, replace = TRUE))
+#' myrpart(data, "target", max_depth = 3)
 myrpart <- function(data, target_col, depth = 0, max_depth) {
 
   unique_classes <- unique(data[[target_col]])

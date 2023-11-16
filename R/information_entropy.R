@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @examples
-#' information_entropy(data[target_columns])
+#' information_entropy(c("cat", "dog", "cat", "dog", "dog", "bird"))
 information_entropy <- function(labels) {
 
   entropysum <- 0

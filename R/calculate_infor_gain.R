@@ -12,7 +12,11 @@
 #' @export
 #'
 #' @examples
-#' calculate_info_gain(data, left_data, right_data, target_col)
+#' data <- data.frame(feature1 = runif(10),feature2 = runif(10),target = sample(c("A", "B"), 10, replace = TRUE))
+#' split_value <- median(data$feature1)
+#' left_data <- data[data$feature1 <= split_value, ]
+#' right_data <- data[data$feature1 > split_value, ]
+#' calculate_info_gain(data, left_data, right_data, 'target')
 calculate_info_gain <- function(data, left_data, right_data, target_col) {
 
   entropy_before_split <- information_entropy(data[[target_col]])
@@ -23,3 +27,5 @@ calculate_info_gain <- function(data, left_data, right_data, target_col) {
   return (entropy_before_split - entropy_after_split)
 
 }
+
+

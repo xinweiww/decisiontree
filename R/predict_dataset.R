@@ -9,7 +9,9 @@
 #' @export
 #'
 #' @examples
-#' predict_dataset(tree_model, test_data)
+#' data <- data.frame(feature1 = runif(10),feature2 = runif(10),target = sample(c("A", "B"), 10, replace = TRUE))
+#' tree <- myrpart(data, "target", max_depth = 3)
+#' predict_dataset(tree, data)
 predict_dataset <- function(tree, dataset) {
   predictions <- sapply(1:nrow(dataset), function(i) predict_point(tree, dataset[i, ]))
   return(predictions)

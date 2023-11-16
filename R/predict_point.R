@@ -9,7 +9,9 @@
 #' @export
 #'
 #' @examples
-#' predict_point(tree, dataset[i, ])
+#' data <- data.frame(feature1 = runif(10),feature2 = runif(10),target = sample(c("A", "B"), 10, replace = TRUE))
+#' tree <- myrpart(data, "target", max_depth = 3)
+#' predict_point(tree, data[1, ])
 predict_point <- function(tree, data_point) {
   # return the node if it is leaf node
   if (tree$leaf) {
