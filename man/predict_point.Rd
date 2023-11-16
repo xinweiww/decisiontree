@@ -15,5 +15,7 @@ predict_point(tree, data_point)
 Make a prediction of a new data point along the decision tree
 }
 \examples{
-predict_point(tree, dataset[i, ])
+data <- data.frame(feature1 = runif(10),feature2 = runif(10),target = sample(c("A", "B"), 10, replace = TRUE))
+tree <- myrpart(data, "target", max_depth = 3)
+predict_point(tree, data[1, ])
 }
