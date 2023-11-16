@@ -36,7 +36,6 @@ This is a basic example which shows you how to solve a common problem:
 ``` r
 library(decisiontree)
 
-# We use a stimulated dataframe with 4 different features and a target column with three different labels 
 set.seed(1)
 data <- data.frame(
   feature1 = runif(100),

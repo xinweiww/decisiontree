@@ -99,11 +99,13 @@ From the output of this test, we can see that even the train accuracy of myrpart
 ```{r out.width='100%', fig.align='center', dpi=300}
 library(ggplot2)
 
+# store the model accuracy
 train_accuracy_myrpart <- numeric()
 test_accuracy_myrpart <- numeric()
 train_accuracy_rpart <- numeric()
 test_accuracy_rpart <- numeric()
 
+# store the model running time 
 total_time_myrpart <- 0
 total_time_rpart <- 0
 
@@ -114,24 +116,26 @@ for (i in 1:n_iterations) {
   train_indices <- sample(1:nrow(data), 0.8 * nrow(data))
   train_data <- data[train_indices, ]
   test_data <- data[-train_indices, ]
-
+  
+  # train myrpart() model
   start_time <- proc.time()
   my_tree_model <- myrpart(train_data, "target", max_depth = 5)
   end_time <- proc.time()
   total_time_myrpart <- total_time_myrpart + (end_time - start_time)[3]
   
+  #train rpart() model
   start_time <- proc.time()
   tree_model <- rpart(target ~ feature1 + feature2, data = train_data, method = "class", maxdepth = 5)
   end_time <- proc.time()
   total_time_rpart <- total_time_rpart + (end_time - start_time)[3]
-  
-  tree_model <- rpart(target ~ feature1 + feature2, data = train_data, method = "class", maxdepth = 5)
 
+  # predict the train and test dataset using the two trained models
   train_pred_myrpart <- predict_dataset(my_tree_model, train_data)
   test_pred_myrpart <- predict_dataset(my_tree_model, test_data)
   train_pred_rpart <- predict(tree_model, train_data, type = "class")
   test_pred_rpart <- predict(tree_model, test_data, type = "class")
 
+  # obtain the accuracy
   train_accuracy_myrpart[i] <- sum(train_pred_myrpart == train_data$target) / nrow(train_data)
   test_accuracy_myrpart[i]  <- sum(test_pred_myrpart == test_data$target) / nrow(test_data)
   train_accuracy_rpart[i] <- sum(train_pred_rpart == train_data$target) / nrow(train_data)
@@ -158,10 +162,10 @@ ggplot(accuracy_data, aes(x = Iteration, y = Accuracy, group = Method)) +
   geom_hline(yintercept = average_test_accuracy_rpart, size = 0.2, linetype = "dashed", color = "orange") +
   labs(title = "Model Accuracy", x = "Iteration", y = "Accuracy") +
   theme_minimal() +
-  theme(legend.position = "bottom",  # 将图例置于底部
-        legend.text = element_text(size = 8),  # 设置图例文本的大小
+  theme(legend.position = "bottom", 
+        legend.text = element_text(size = 8), 
         legend.key.size = unit(0.5, "cm"))+
-  guides(color = guide_legend(nrow = 2))# 设置图例键的大小
+  guides(color = guide_legend(nrow = 2))
 
 
 cat("Total time for myrpart: ", total_time_myrpart, "seconds\n")
