@@ -20,5 +20,6 @@ Used to mimic the original r function rpart(), the node structure of decision tr
 generate the whole decision tree iteratively
 }
 \examples{
-myrpart(train_data, "target", max_depth = 3)
+data <- data.frame(feature1 = runif(10),feature2 = runif(10),target = sample(c("A", "B"), 10, replace = TRUE))
+myrpart(data, "target", max_depth = 3)
 }
