@@ -13,5 +13,5 @@ information_entropy(labels)
 Information entropy is used to quantify the impurity or disorder in a dataset
 }
 \examples{
-information_entropy(data[target_columns])
+information_entropy(c("cat", "dog", "cat", "dog", "dog", "bird"))
 }

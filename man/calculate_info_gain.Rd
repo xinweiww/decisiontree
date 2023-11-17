@@ -20,5 +20,9 @@ Used to calculate the information gain after splitting a node into left part and
 for splitting a node
 }
 \examples{
-calculate_info_gain(data, left_data, right_data, target_col)
+data <- data.frame(feature1 = runif(10),feature2 = runif(10),target = sample(c("A", "B"), 10, replace = TRUE))
+split_value <- median(data$feature1)
+left_data <- data[data$feature1 <= split_value, ]
+right_data <- data[data$feature1 > split_value, ]
+calculate_info_gain(data, left_data, right_data, 'target')
 }

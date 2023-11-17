@@ -15,5 +15,6 @@ find_best_split(data, target_col)
 Used to find the best split based on the largest information gain
 }
 \examples{
-find_best_split(data, target_col)
+data <- data.frame(feature1 = runif(10),feature2 = runif(10),target = sample(c("A", "B"), 10, replace = TRUE))
+find_best_split(data, 'target')
 }
