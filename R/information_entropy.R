@@ -11,6 +11,7 @@
 #' information_entropy(c("cat", "dog", "cat", "dog", "dog", "bird"))
 information_entropy <- function(labels) {
 
+  # the definition of information entropy
   entropysum <- 0
   class_probabilities <- table(labels) / length(labels)
   # in order to avoid the situations where class_probabilities equal zero, 1e-10 is added

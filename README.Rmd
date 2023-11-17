@@ -45,8 +45,8 @@ library(decisiontree)
 
 set.seed(1)
 data <- data.frame(
-  feature1 = runif(100),
-  feature2 = runif(100),
+  col1 = runif(100),
+  col2 = runif(100),
   target = sample(c("A", "B"), 100, replace = TRUE)
 )
 
