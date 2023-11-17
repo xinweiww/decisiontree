@@ -34,9 +34,9 @@ find_best_split <- function(data, target_col) {
 
       info_gain <- calculate_info_gain(data, left_data, right_data, target_col)
 
-      if (is.na(info_gain) || is.nan(info_gain)) {
-        next #avoid Na or NaN values
-      }
+      #if (is.na(info_gain) || is.nan(info_gain)) {
+       # next #avoid Na or NaN
+      #}
 
       if (info_gain > best_info_gain) {
         best_info_gain <- info_gain
