@@ -4,7 +4,8 @@
 # Overview
 
 <!-- badges: start -->
-![R-CMD-check](https://github.com/<xinweiww>/<https://github.com/xinweiww/decisiontree>/actions/workflows/R-CMD-check.yaml/badge.svg?branch=<main>)
+[![codecov](https://codecov.io/gh/xinweiww/decisiontree/branch/main/graph/badge.svg)](https://codecov.io/gh/xinweiww/decisiontree)
+
 <!-- badges: end -->
 
 The goal of decisiontree is to predict the class of an input data point
